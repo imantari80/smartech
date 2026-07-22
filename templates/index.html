@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartTech S.A.C. — Arma Tu PC Sin Errores Técnicos</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome (iconos redes sociales + chat) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+
+  <!-- ╔═══════════════════════════════════╗
+       ║           NAVEGACIÓN             ║
+       ╚═══════════════════════════════════╝ -->
+  <nav class="navbar">
+    <a href="/" class="navbar__brand">
+      <div class="brand-icon">S</div>
+      SmartTech S.A.C.
+    </a>
+
+    <ul class="navbar__links">
+      <li><a href="/productos">Productos</a></li>
+      <li><a href="/servicios">Servicios</a></li>
+      <li><a href="/cotizador">Cotizador</a></li>
+      <li><a href="/nosotros">Nosotros</a></li>
+      <li><a href="/mi-cuenta">Mi Cuenta</a></li>
+    </ul>
+  </nav>
+
+  <!-- ╔═══════════════════════════════════╗
+       ║              HERO                ║
+       ╚═══════════════════════════════════╝ -->
+  <section class="hero">
+    <div class="hero__content">
+      <h1>Arma Tu PC Sin Errores Técnicos.</h1>
+      <p>
+        Usa nuestro Asistente Digital Inteligente.<br />
+        Compatibilidad Garantizada.
+      </p>
+      <a href="/cotizador" class="btn-primary">[Empezar Cotización]</a>
+    </div>
+  </section>
+
+  <!-- ╔═══════════════════════════════════╗
+       ║          PRODUCTOS               ║
+       ╚═══════════════════════════════════╝ -->
+  <section class="products">
+    <div class="products__grid">
+
+      {% if productos %}
+        {% for p in productos %}
+        <div class="product-card">
+          <div class="product-card__img">
+            {% if p.imagen %}
+              <img src="{{ url_for('static', filename='img/' ~ p.imagen) }}" alt="{{ p.nombre }}" />
+            {% else %}
+              <div class="product-card__placeholder">
+                <i class="fa-regular fa-image"></i>
+              </div>
+            {% endif %}
+          </div>
+          <h3>{{ p.nombre }}</h3>
+          <p class="price">S/. {{ "%.2f"|format(p.precio) }}</p>
+        </div>
+        {% endfor %}
+
+      {% else %}
+        <!-- Tarjetas de ejemplo cuando no hay datos desde la BD -->
+        {% set categorias = [
+          ('Laptops de Última Generación', 'fa-laptop'),
+          ('Procesadores Validatorios',    'fa-microchip'),
+          ('Tarjetas Gráficas',            'fa-display'),
+          ('Colipturas',                   'fa-keyboard'),
+          ('Monitores',                    'fa-desktop'),
+          ('Memorias RAM',                 'fa-memory'),
+          ('Almacenamiento SSD',           'fa-hard-drive'),
+          ('Fuentes de Poder',             'fa-plug')
+        ] %}
+        {% for nombre, icono in categorias %}
+        <div class="product-card">
+          <div class="product-card__img">
+            <div class="product-card__placeholder">
+              <i class="fa-solid {{ icono }}"></i>
+            </div>
+          </div>
+          <h3>{{ nombre }}</h3>
+          <p class="price">S/. 1,500.00</p>
+        </div>
+        {% endfor %}
+      {% endif %}
+
+    </div>
+  </section>
+
+  <!-- ╔═══════════════════════════════════╗
+       ║            FOOTER                ║
+       ╚═══════════════════════════════════╝ -->
+  <footer class="footer">
+    <span>
+      © 2024 SmartTech S.A.C. - Todos los derechos reservados. |
+      <a href="/privacidad" style="color:inherit;text-decoration:underline;">
+        Políticas de Privacidad (Ley N° 29733)
+      </a>
+    </span>
+    <div class="footer__socials">
+      <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+      <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+  </footer>
+
+  <!-- ╔═══════════════════════════════════╗
+       ║         CHAT WIDGET              ║
+       ╚═══════════════════════════════════╝ -->
+
+  <!-- Ventana del chat -->
+  <div id="chat-window" class="chat-window" role="dialog" aria-label="Asistente Virtual SmartTech">
+
+    <!-- Encabezado -->
+    <div class="chat-header">
+      <div class="chat-header__avatar">🤖</div>
+      <div class="chat-header__info">
+        <strong>SmartTech</strong>
+        <span>Asistente Virtual</span>
+      </div>
+      <div class="chat-header__brand">S<br/>SmartTech</div>
+    </div>
+
+    <!-- Mensajes -->
+    <div id="chat-messages" class="chat-messages"></div>
+
+    <!-- Input -->
+    <div class="chat-input-row">
+      <input
+        id="chat-input"
+        class="chat-input"
+        type="text"
+        placeholder="Escribe tu consulta aquí..."
+        autocomplete="off"
+        aria-label="Mensaje al asistente"
+      />
+      <span class="chat-input-icon"><i class="fa-solid fa-paperclip"></i></span>
+      <span class="chat-input-icon" id="chat-send"><i class="fa-solid fa-paper-plane"></i></span>
+    </div>
+  </div>
+
+  <!-- Botón flotante -->
+  <button id="chat-fab" class="chat-fab" aria-label="Abrir asistente virtual">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+    </svg>
+  </button>
+
+  <!-- Script del chat -->
+  <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>

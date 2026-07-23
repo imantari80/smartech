@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartTech S.A.C. — Servicios</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 5%; background: #ffffff; border-bottom: 1px solid var(--border);
+    }
+    .navbar__brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; color: var(--text); text-decoration: none; }
+    .brand-icon { background: var(--primary); color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .navbar__links { display: flex; gap: 20px; list-style: none; }
+    .navbar__links a { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
+    .navbar__links a.active, .navbar__links a:hover { color: var(--primary); font-weight: 600; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 50px 20px 30px; background: linear-gradient(180deg, #eff6ff 0%, var(--bg) 100%); }
+    .hero__badge { display: inline-flex; align-items: center; gap: 8px; background: #dbeafe; color: var(--primary); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; margin-bottom: 15px; }
+    .hero h1 { font-size: 2.2rem; font-weight: 800; color: #1e293b; margin-bottom: 10px; }
+    .hero p { color: var(--text-muted); max-width: 600px; margin: 0 auto; font-size: 1rem; }
+
+    /* GRID DE SERVICIOS */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 40px 0; }
+
+    .service-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: all 0.25s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .service-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.1); }
+
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-icon { width: 48px; height: 48px; background: #eff6ff; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+    .card-tag { background: #f1f5f9; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; }
+
+    .service-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
+    .service-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
+
+    .features-list { list-style: none; margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px; }
+    .features-list li { font-size: 0.85rem; color: #475569; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+    .features-list i { color: #10b981; }
+
+    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 10px; font-weight: 600; text-decoration: none; font-size: 0.9rem; transition: background 0.2s; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    /* CTA BANNER */
+    .cta-banner {
+      background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff;
+      border-radius: 20px; padding: 40px; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 20px; margin-top: 20px;
+    }
+    .cta-banner h2 { font-size: 1.5rem; margin-bottom: 6px; }
+    .cta-banner p { color: #94a3b8; font-size: 0.95rem; }
+    .cta-banner .btn { width: auto; padding: 12px 24px; white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="{{ url_for('chat.index') }}" class="navbar__brand">
+      <div class="brand-icon"><i class="fa-solid fa-desktop"></i></div>
+      SmartTech S.A.C.
+    </a>
+    <ul class="navbar__links">
+      <li><a href="{{ url_for('chat.index') }}" class="active">Inicio</a></li>
+      <li><a href="{{ url_for('chat.servicios') }}" class="active">Servicios</a></li>
+      <li><a href="{{ url_for('chat.cotizador') }}">Cotizador</a></li>
+      <li><a href="{{ url_for('chat.nosotros') }}">Nosotros</a></li>
+      <li><a href="{{ url_for('chat.mi_cuenta') }}">Mi Cuenta</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="hero__badge"><i class="fa-solid fa-shield-halved"></i> Garantía & Respaldo Técnico</span>
+    <h1>Servicios Especializados de Hardware</h1>
+    <p>Selecciona un servicio para iniciar tu atención guiada a través de nuestro Asistente Virtual.</p>
+  </section>
+
+  <!-- SERVICIOS -->
+  <div class="container">
+    <div class="services-grid">
+
+      <!-- OPCIÓN 1 -->
+      <div class="service-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+            <span class="card-tag">Popular</span>
+          </div>
+          <h3>Ensamblaje & Cable Management</h3>
+          <p>Armado profesional paso a paso, optimización de flujo de aire en chasis, prueba de estrés térmico y calibración en BIOS/XMP.</p>
+          <ul class="features-list">
+            <li><i class="fa-solid fa-check"></i> Pruebas de Estrés Continuas</li>
+            <li><i class="fa-solid fa-check"></i> Gestión de Cables Profesional</li>
+            <li><i class="fa-solid fa-check"></i> Setup de OS & Controladores</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('chat.index') }}" class="btn btn-primary">Ir al Chat para Ensamblaje <i class="fa-solid fa-comments"></i></a>
+      </div>
+
+      <!-- OPCIÓN 2 -->
+      <div class="service-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon"><i class="fa-solid fa-microchip"></i></div>
+            <span class="card-tag">Mantenimiento</span>
+          </div>
+          <h3>Limpieza Profunda & Pasteo Térmico</h3>
+          <p>Mantenimiento preventivo/correctivo para laptops y PCs. Uso de pasta térmica de alta conductividad y desintoxicación de polvo.</p>
+          <ul class="features-list">
+            <li><i class="fa-solid fa-check"></i> Pasta Térmica Premium</li>
+            <li><i class="fa-solid fa-check"></i> Limpieza Ultrasonido / Aire</li>
+            <li><i class="fa-solid fa-check"></i> Reducción de Temperatura</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('chat.index') }}" class="btn btn-primary">Ir al Chat para Mantenimiento <i class="fa-solid fa-comments"></i></a>
+      </div>
+
+      <!-- OPCIÓN 3 -->
+      <div class="service-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon"><i class="fa-solid fa-rocket"></i></div>
+            <span class="card-tag">Upgrade</span>
+          </div>
+          <h3>Repotenciación & Migración NVMe</h3>
+          <p>Eliminación de cuellos de botella con upgrades estratégicos de RAM, GPU o SSD M.2 con clonación de datos sin pérdidas.</p>
+          <ul class="features-list">
+            <li><i class="fa-solid fa-check"></i> Clonación sin Pérdida de Datos</li>
+            <li><i class="fa-solid fa-check"></i> Diagnóstico de Compatibilidad</li>
+            <li><i class="fa-solid fa-check"></i> Incremento Real de FPS</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('chat.index') }}" class="btn btn-primary">Ir al Chat para Upgrade <i class="fa-solid fa-comments"></i></a>
+      </div>
+
+      <!-- OPCIÓN 4 -->
+      <div class="service-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon"><i class="fa-solid fa-headset"></i></div>
+            <span class="card-tag">Soporte</span>
+          </div>
+          <h3>Soporte Técnico Especializado</h3>
+          <p>Atención directa por especialistas. Diagnósticos electrónicos, resolución de fallas de software/hardware y asesoría pre-compra.</p>
+          <ul class="features-list">
+            <li><i class="fa-solid fa-check"></i> Diagnóstico Electrónico</li>
+            <li><i class="fa-solid fa-check"></i> Asesoría de Hardware Directa</li>
+            <li><i class="fa-solid fa-check"></i> Garantía de Servicio</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('chat.index') }}" class="btn btn-primary">Ir al Chat con Soporte <i class="fa-solid fa-comments"></i></a>
+      </div>
+
+    </div>
+
+    <!-- BANNER FINAL -->
+    <div class="cta-banner">
+      <div>
+        <h2>¿Quieres armar o cotizar una PC completa?</h2>
+        <p>Nuestro asistente virtual evalúa tu presupuesto en tiempo real sin riesgo de incompatibilidades.</p>
+      </div>
+      <a href="{{ url_for('chat.index') }}" class="btn btn-primary">Iniciar Chat Inteligente <i class="fa-solid fa-robot"></i></a>
+    </div>
+  </div>
+
+</body>
+</html>

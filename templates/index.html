@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Font Awesome (iconos redes sociales + chat) -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <!-- Estilos propios -->
@@ -18,25 +18,25 @@
 <body>
 
   <!-- ╔═══════════════════════════════════╗
-       ║           NAVEGACIÓN             ║
+       ║           NAVEGACIÓN              ║
        ╚═══════════════════════════════════╝ -->
   <nav class="navbar">
-    <a href="/" class="navbar__brand">
+    <a href="{{ url_for('chat.index') }}" class="navbar__brand">
       <div class="brand-icon">S</div>
       SmartTech S.A.C.
     </a>
 
     <ul class="navbar__links">
-      <li><a href="/productos">Productos</a></li>
-      <li><a href="/servicios">Servicios</a></li>
-      <li><a href="/cotizador">Cotizador</a></li>
-      <li><a href="/nosotros">Nosotros</a></li>
-      <li><a href="/mi-cuenta">Mi Cuenta</a></li>
+      <li><a href="{{ url_for('chat.index') }}" class="active">Inicio</a></li>
+      <li><a href="{{ url_for('chat.servicios') }}">Servicios</a></li>
+      <li><a href="{{ url_for('chat.cotizador') }}">Cotizador</a></li>
+      <li><a href="{{ url_for('chat.nosotros') }}">Nosotros</a></li>
+      <li><a href="{{ url_for('chat.mi_cuenta') }}">Mi Cuenta</a></li>
     </ul>
   </nav>
 
   <!-- ╔═══════════════════════════════════╗
-       ║              HERO                ║
+       ║              HERO                 ║
        ╚═══════════════════════════════════╝ -->
   <section class="hero">
     <div class="hero__content">
@@ -45,12 +45,14 @@
         Usa nuestro Asistente Digital Inteligente.<br />
         Compatibilidad Garantizada.
       </p>
-      <a href="/cotizador" class="btn-primary">[Empezar Cotización]</a>
+      <p class="hero__notice">
+        <i class="fa-solid fa-circle-arrow-down"></i> Empieza a cotizar desde el ícono de mensaje en la parte inferior derecha.
+      </p>
     </div>
   </section>
 
   <!-- ╔═══════════════════════════════════╗
-       ║          PRODUCTOS               ║
+       ║           PRODUCTOS               ║
        ╚═══════════════════════════════════╝ -->
   <section class="products">
     <div class="products__grid">
@@ -101,7 +103,7 @@
   </section>
 
   <!-- ╔═══════════════════════════════════╗
-       ║            FOOTER                ║
+       ║            FOOTER                 ║
        ╚═══════════════════════════════════╝ -->
   <footer class="footer">
     <span>
@@ -118,7 +120,7 @@
   </footer>
 
   <!-- ╔═══════════════════════════════════╗
-       ║         CHAT WIDGET              ║
+       ║         CHAT WIDGET               ║
        ╚═══════════════════════════════════╝ -->
 
   <!-- Ventana del chat -->

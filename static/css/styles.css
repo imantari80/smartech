@@ -422,3 +422,4 @@ img { max-width: 100%; display: block; }
   .chat-window { width: calc(100vw - 20px); right: 10px; }
   .footer { flex-direction: column; gap: 8px; text-align: center; }
 }
+

@@ -29,6 +29,21 @@ try:
     cursor = conn.cursor()
     print("🔌 Conexión exitosa a la base de datos.")
 
+    # 1. Crear la tabla 'componentes' si no existe
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS componentes (
+        id SERIAL PRIMARY KEY,
+        categoria VARCHAR(100) NOT NULL,
+        marca VARCHAR(50) NOT NULL,
+        modelo VARCHAR(150) NOT NULL,
+        descripcion TEXT,
+        precio DECIMAL(10, 2) NOT NULL
+    );
+    """
+    cursor.execute(create_table_query)
+    print("🛠️ Tabla 'componentes' verificada/creada correctamente.")
+
+    # 2. Query de inserción
     query = """
         INSERT INTO componentes (id, categoria, marca, modelo, descripcion, precio)
         VALUES (%s, %s, %s, %s, %s, %s)

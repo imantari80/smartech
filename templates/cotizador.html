@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartTech S.A.C. — Cotizador Inteligente</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent-cyan: #06b6d4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 5%; background: #ffffff; border-bottom: 1px solid var(--border);
+    }
+    .navbar__brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; color: var(--text); text-decoration: none; }
+    .brand-icon { background: var(--primary); color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .navbar__links { display: flex; gap: 20px; list-style: none; }
+    .navbar__links a { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
+    .navbar__links a.active, .navbar__links a:hover { color: var(--primary); font-weight: 600; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 50px 20px 30px; background: linear-gradient(180deg, #eff6ff 0%, var(--bg) 100%); }
+    .hero__badge { display: inline-flex; align-items: center; gap: 8px; background: #dbeafe; color: var(--primary); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; margin-bottom: 15px; }
+    .hero h1 { font-size: 2.2rem; font-weight: 800; color: #1e293b; margin-bottom: 10px; }
+    .hero p { color: var(--text-muted); max-width: 650px; margin: 0 auto; font-size: 1rem; line-height: 1.5; }
+
+    /* CONTAINER */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* GRID DE PASOS */
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px; margin-top: 20px; margin-bottom: 30px;
+    }
+    .step-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+      position: relative; transition: transform 0.2s, border-color 0.2s;
+    }
+    .step-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+    .step-number {
+      position: absolute; top: 20px; right: 20px; font-weight: 800;
+      font-size: 1.8rem; color: #e2e8f0; line-height: 1;
+    }
+    .step-icon {
+      width: 44px; height: 44px; background: #eff6ff; color: var(--primary);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 18px;
+    }
+    .step-card h3 { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .step-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* BANNER DE INSTRUCCIÓN AL CHAT */
+    .chat-guide-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff; border-radius: 20px; padding: 35px; margin: 30px 0;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 25px; flex-wrap: wrap;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+    }
+    .chat-guide-banner__text { max-width: 650px; }
+    .chat-guide-banner h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .chat-guide-banner h2 i { color: var(--accent-cyan); }
+    .chat-guide-banner p { color: #94a3b8; font-size: 0.98rem; line-height: 1.6; }
+
+    /* BOTÓN DE ACCIÓN AL CHAT */
+    .btn-start-chat {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
+      color: #ffffff; font-weight: 700; padding: 14px 26px; border-radius: 12px;
+      text-decoration: none; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-start-chat:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6); }
+
+    /* FOOTER */
+    .footer {
+      max-width: 1100px; margin: 40px auto 0; padding: 20px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+      font-size: 0.85rem; color: var(--text-muted);
+    }
+    .footer__socials { display: flex; gap: 15px; }
+    .footer__socials a { color: var(--text-muted); font-size: 1.1rem; transition: color 0.2s; }
+    .footer__socials a:hover { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN -->
+  <nav class="navbar">
+    <a href="{{ url_for('chat.index') }}" class="navbar__brand">
+      <div class="brand-icon">S</div>
+      SmartTech S.A.C.
+    </a>
+
+    <ul class="navbar__links">
+      <li><a href="{{ url_for('chat.index') }}" class="active">Inicio</a></li>
+      <li><a href="{{ url_for('chat.servicios') }}">Servicios</a></li>
+      <li><a href="{{ url_for('chat.cotizador') }}" class="active">Cotizador</a></li>
+      <li><a href="{{ url_for('chat.nosotros') }}">Nosotros</a></li>
+      <li><a href="{{ url_for('chat.mi_cuenta') }}">Mi Cuenta</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="hero__badge"><i class="fa-solid fa-robot"></i> Asesoría Asistida por IA</span>
+    <h1>Cotizador Inteligente de Computadoras</h1>
+    <p>Diseña la PC perfecta para tu presupuesto con validación técnica de compatibilidad en tiempo real.</p>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="container">
+    
+    <!-- 1. PRIMERO LOS PASOS EXPLICATIVOS -->
+    <div class="steps-grid">
+      <div class="step-card">
+        <span class="step-number">01</span>
+        <div class="step-icon"><i class="fa-solid fa-user-gear"></i></div>
+        <h3>Selecciona Perfil</h3>
+        <p>Gamer, Ingeniería/Diseño, Colegio u Ofimática.</p>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">02</span>
+        <div class="step-icon"><i class="fa-solid fa-wallet"></i></div>
+        <h3>Define Presupuesto</h3>
+        <p>Ingresa tu monto objetivo estimado en soles (S/.).</p>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">03</span>
+        <div class="step-icon"><i class="fa-solid fa-microchip"></i></div>
+        <h3>Evaluación de Hardware</h3>
+        <p>Validamos compatibilidad de socket, energía y chasis.</p>
+      </div>
+
+      <div class="step-card">
+        <span class="step-number">04</span>
+        <div class="step-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <h3>Proforma Generada</h3>
+        <p>Recibe la lista detallada lista para ensamblar o comprar.</p>
+      </div>
+    </div>
+
+    <!-- 2. LUEGO EL BANNER DE INICIAR COTIZACIÓN -->
+    <div class="chat-guide-banner">
+      <div class="chat-guide-banner__text">
+        <h2><i class="fa-solid fa-comments"></i> Inicia tu Cotización Guiada</h2>
+        <p>
+          Interactúa directamente con nuestro Asistente Virtual para armar tu configuración personalizada según tu perfil de uso y presupuesto.
+        </p>
+      </div>
+      
+      <!-- Redirecciona a la vista principal activando la cotización -->
+      <a href="{{ url_for('chat.index') }}?open_chat=true" class="btn-start-chat">
+        Ir al Chatbot <i class="fa-solid fa-paper-plane"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>© 2024 SmartTech S.A.C. - Todos los derechos reservados. | <a href="/privacidad" style="color:inherit;text-decoration:underline;">Ley N° 29733</a></span>
+    <div class="footer__socials">
+      <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+      <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+  </footer>
+
+</body>
+</html>

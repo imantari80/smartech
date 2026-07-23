@@ -205,6 +205,10 @@ def construir_cierre(session_obj):
     return texto, gran_total
 
 
+# ==========================================
+# RUTAS DE VISTA Y NAVEGACIÓN
+# ==========================================
+
 @chat_bp.route('/')
 def index():
     session.clear()
@@ -215,6 +219,35 @@ def index():
         session[k] = None
     return render_template('index.html')
 
+
+@chat_bp.route('/productos')
+def productos():
+    return render_template('productos.html')
+
+
+@chat_bp.route('/servicios')
+def servicios():
+    return render_template('servicios.html')
+
+
+@chat_bp.route('/cotizador')
+def cotizador():
+    return render_template('cotizador.html')
+
+
+@chat_bp.route('/nosotros')
+def nosotros():
+    return render_template('nosotros.html')
+
+
+@chat_bp.route('/mi-cuenta')
+def mi_cuenta():
+    return render_template('mi_cuenta.html')
+
+
+# ==========================================
+# ENDPOINTS API (CHAT Y PDF)
+# ==========================================
 
 @chat_bp.route('/api/generar-pdf')
 def generar_pdf():

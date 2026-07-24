@@ -31,7 +31,12 @@
       <li><a href="{{ url_for('chat.servicios') }}">Servicios</a></li>
       <li><a href="{{ url_for('chat.cotizador') }}">Cotizador</a></li>
       <li><a href="{{ url_for('chat.nosotros') }}">Nosotros</a></li>
-      <li><a href="{{ url_for('chat.mi_cuenta') }}">Mi Cuenta</a></li>
+      {% if session.get('admin_id') %}
+        <li><a href="{{ url_for('chat.dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('chat.logout') }}">Cerrar sesión</a></li>
+      {% else %}
+        <li><a href="{{ url_for('chat.mi_cuenta') }}">Mi Cuenta</a></li>
+      {% endif %}
     </ul>
   </nav>
 

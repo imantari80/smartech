@@ -1,8 +1,9 @@
-from flask import Blueprint, request, jsonify, render_template, session, send_file
+from flask import Blueprint, request, jsonify, render_template, session, send_file, redirect, url_for
 import re
 import io
 import urllib.parse
 import psycopg2
+from datetime import datetime, timedelta
 from services import (
     obtener_conexion,
     cotizar_equipo_completo,
@@ -10,6 +11,9 @@ from services import (
     buscar_periferico,
 )
 from pdf_generator import generar_pdf_proforma
+import chat_logger
+from export_estadisticas import generar_reporte_excel, resumen_dashboard
+from auth import verificar_credenciales, login_requerido
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -240,9 +244,50 @@ def nosotros():
     return render_template('nosotros.html')
 
 
-@chat_bp.route('/mi-cuenta')
+@chat_bp.route('/mi-cuenta', methods=['GET', 'POST'])
 def mi_cuenta():
-    return render_template('mi_cuenta.html')
+    """
+    Acceso EXCLUSIVO para administradores del sistema. No existe registro
+    público: las cuentas se crean directamente en la base de datos
+    (ver crear_admin.py / tabla `administradores`).
+    """
+    if session.get('admin_id'):
+        return redirect(url_for('chat.dashboard'))
+
+    error = None
+    if request.method == 'POST':
+        usuario = request.form.get('usuario', '').strip()
+        password = request.form.get('password', '')
+
+        try:
+            admin = verificar_credenciales(usuario, password)
+        except psycopg2.OperationalError:
+            admin = None
+            error = "⚠️ No se pudo conectar con la base de datos. Intenta nuevamente en unos minutos."
+
+        if admin:
+            session['admin_id'] = admin['id']
+            session['admin_usuario'] = admin['usuario']
+            session['admin_nombre'] = admin['nombre']
+            return redirect(url_for('chat.dashboard'))
+        elif not error:
+            error = "Usuario o contraseña incorrectos."
+
+    return render_template('mi_cuenta.html', error=error)
+
+
+@chat_bp.route('/dashboard')
+@login_requerido
+def dashboard():
+    return render_template('dashboard.html', admin_nombre=session.get('admin_nombre'))
+
+
+@chat_bp.route('/logout')
+def logout():
+    session.pop('admin_id', None)
+    session.pop('admin_usuario', None)
+    session.pop('admin_nombre', None)
+    return redirect(url_for('chat.mi_cuenta'))
 
 
 # ==========================================
@@ -268,6 +313,72 @@ def generar_pdf():
     return send_file(
         buffer, mimetype='application/pdf',
         as_attachment=True, download_name='Proforma_Smartech.pdf'
+    )
+
+
+@chat_bp.route('/api/estadisticas/resumen')
+@login_requerido
+def resumen_estadisticas():
+    """KPIs rápidos + serie de los últimos 14 días, para las tarjetas y el
+    gráfico del dashboard. Solo accesible con sesión de administrador."""
+    try:
+        return jsonify(resumen_dashboard())
+    except psycopg2.OperationalError:
+        return jsonify({"error": "No se pudo conectar a la base de datos."}), 503
+
+
+@chat_bp.route('/api/estadisticas/exportar')
+@login_requerido
+def exportar_estadisticas():
+    """
+    Exporta a Excel las estadísticas de uso del chatbot (cuántas consultas
+    se hicieron) en un rango de fechas, agrupadas por día, semana o mes.
+
+    Parámetros de query string (todos opcionales):
+      - desde      : 'YYYY-MM-DD' (por defecto: hace 30 días)
+      - hasta      : 'YYYY-MM-DD' (por defecto: hoy)
+      - agrupacion : 'dia' | 'semana' | 'mes'  (por defecto: 'dia')
+
+    Ejemplos:
+      /api/estadisticas/exportar
+      /api/estadisticas/exportar?agrupacion=semana
+      /api/estadisticas/exportar?desde=2026-01-01&hasta=2026-06-30&agrupacion=mes
+    """
+    agrupacion = request.args.get('agrupacion', 'dia')
+    hasta_str = request.args.get('hasta')
+    desde_str = request.args.get('desde')
+
+    try:
+        hoy = datetime.now().date()
+        fecha_fin_incl = (
+            datetime.strptime(hasta_str, '%Y-%m-%d').date() if hasta_str else hoy
+        )
+        fecha_inicio = (
+            datetime.strptime(desde_str, '%Y-%m-%d').date() if desde_str
+            else fecha_fin_incl - timedelta(days=30)
+        )
+    except ValueError:
+        return jsonify({"error": "Formato de fecha inválido. Usa YYYY-MM-DD."}), 400
+
+    fecha_fin_exclusiva = fecha_fin_incl + timedelta(days=1)  # incluye todo el día 'hasta'
+
+    try:
+        buffer = generar_reporte_excel(
+            datetime.combine(fecha_inicio, datetime.min.time()),
+            datetime.combine(fecha_fin_exclusiva, datetime.min.time()),
+            agrupacion=agrupacion,
+        )
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except psycopg2.OperationalError:
+        return jsonify({"error": "No se pudo conectar a la base de datos."}), 503
+
+    nombre_archivo = f"Estadisticas_Chatbot_{fecha_inicio}_a_{fecha_fin_incl}_{agrupacion}.xlsx"
+    return send_file(
+        buffer,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=nombre_archivo,
     )
 
 
@@ -299,6 +410,16 @@ def chat():
             cursor.close()
         if conn:
             conn.close()
+
+    # ── Registro de la consulta para fines estadísticos (best-effort: si
+    #    falla, nunca interrumpe la respuesta real del chatbot) ──
+    sesion_id = chat_logger.obtener_sesion_id(session)
+    chat_logger.registrar_evento(
+        conn, cursor, sesion_id, paso_actual, mensaje,
+        perfil=session.get('perfil'),
+        formato=session.get('formato'),
+        presupuesto=session.get('presupuesto'),
+    )
 
     try:
         # ==========================================

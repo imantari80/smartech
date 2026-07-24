@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — SmartTech S.A.C.</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body class="panel-body">
+
+  <!-- ╔═══════════════════════════════════╗
+       ║           NAVEGACIÓN              ║
+       ╚═══════════════════════════════════╝ -->
+  <nav class="navbar">
+    <a href="{{ url_for('chat.index') }}" class="navbar__brand">
+      <div class="brand-icon">S</div>
+      SmartTech S.A.C.
+    </a>
+    <ul class="navbar__links">
+      <li><a href="{{ url_for('chat.index') }}">Inicio</a></li>
+      <li><a href="{{ url_for('chat.servicios') }}">Servicios</a></li>
+      <li><a href="{{ url_for('chat.cotizador') }}">Cotizador</a></li>
+      <li><a href="{{ url_for('chat.nosotros') }}">Nosotros</a></li>
+      <li><a href="{{ url_for('chat.dashboard') }}" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+      <li><a href="{{ url_for('chat.logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a></li>
+    </ul>
+  </nav>
+
+  <!-- ╔═══════════════════════════════════╗
+       ║           DASHBOARD                ║
+       ╚═══════════════════════════════════╝ -->
+  <section class="dashboard">
+    <div class="dashboard__header">
+      <h1>Hola, {{ admin_nombre or 'Administrador' }} 👋</h1>
+      <p>Estadísticas de uso del chatbot de SmartTech.</p>
+    </div>
+
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-card__value" id="kpi-hoy">—</span>
+        <span class="kpi-card__label">Consultas hoy</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-card__value" id="kpi-semana">—</span>
+        <span class="kpi-card__label">Consultas esta semana</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-card__value" id="kpi-mes">—</span>
+        <span class="kpi-card__label">Consultas este mes</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-card__value" id="kpi-conversaciones">—</span>
+        <span class="kpi-card__label">Conversaciones únicas (mes)</span>
+      </div>
+    </div>
+
+    <div class="dashboard__grid">
+
+      <div class="panel-box">
+        <h2>Consultas — últimos 14 días</h2>
+        <canvas id="grafico-consultas" height="130"></canvas>
+      </div>
+
+      <div class="panel-box">
+        <h2>Exportar reporte a Excel</h2>
+        <p class="panel-box__hint">Elige un rango de fechas y cómo agrupar los resultados.</p>
+        <form id="form-exportar" class="export-form" method="GET" action="{{ url_for('chat.exportar_estadisticas') }}" target="_blank">
+          <div class="export-form__row">
+            <label for="desde">Desde</label>
+            <input type="date" id="desde" name="desde" required />
+          </div>
+          <div class="export-form__row">
+            <label for="hasta">Hasta</label>
+            <input type="date" id="hasta" name="hasta" required />
+          </div>
+          <div class="export-form__row">
+            <label for="agrupacion">Agrupar por</label>
+            <select id="agrupacion" name="agrupacion">
+              <option value="dia">Día</option>
+              <option value="semana">Semana</option>
+              <option value="mes">Mes</option>
+            </select>
+          </div>
+          <button type="submit" class="login-btn">
+            <i class="fa-solid fa-file-excel"></i> Descargar Excel
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ╔═══════════════════════════════════╗
+       ║            FOOTER                 ║
+       ╚═══════════════════════════════════╝ -->
+  <footer class="footer">
+    <span>© 2024 SmartTech S.A.C. - Todos los derechos reservados.</span>
+  </footer>
+
+  <script>
+    // Rango por defecto del formulario de exportación: últimos 30 días
+    const hoy = new Date();
+    const hace30 = new Date();
+    hace30.setDate(hoy.getDate() - 30);
+    document.getElementById('hasta').value = hoy.toISOString().slice(0, 10);
+    document.getElementById('desde').value = hace30.toISOString().slice(0, 10);
+
+    // Cargar KPIs + gráfico desde /api/estadisticas/resumen
+    fetch("{{ url_for('chat.resumen_estadisticas') }}")
+      .then(res => {
+        if (!res.ok) throw new Error('No se pudo cargar el resumen');
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById('kpi-hoy').textContent = data.hoy ?? 0;
+        document.getElementById('kpi-semana').textContent = data.semana ?? 0;
+        document.getElementById('kpi-mes').textContent = data.mes ?? 0;
+        document.getElementById('kpi-conversaciones').textContent = data.conversaciones_mes ?? 0;
+
+        const serie = data.serie || [];
+        const etiquetas = serie.map(p => p.fecha.slice(5)); // MM-DD
+        const valores = serie.map(p => p.total);
+
+        new Chart(document.getElementById('grafico-consultas'), {
+          type: 'bar',
+          data: {
+            labels: etiquetas,
+            datasets: [{
+              label: 'Consultas',
+              data: valores,
+              backgroundColor: '#2E75B6',
+              borderRadius: 4,
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('kpi-grid').insertAdjacentHTML(
+          'beforeend',
+        );
+      });
+  </script>
+
+</body>
+</html>
